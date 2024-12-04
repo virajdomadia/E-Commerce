@@ -1,0 +1,28 @@
+.cart-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.cart-item-image {
+    width: 100px;
+    height: 100px;
+    object-fit: cover;
+}
+
+.cart-item-details {
+    margin-left: 20px;
+}
+
+.cart-item-quantity {
+    width: 50px;
+    margin-right: 10px;
+}
+
+.cart-item-remove {
+    padding: 5px 10px;
+    background-color: red;
+    color: white;
+    border: none;
+    cursor: pointer;
+}
