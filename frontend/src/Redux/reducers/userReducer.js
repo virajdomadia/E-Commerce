@@ -2,6 +2,8 @@ import { SET_USER, LOGOUT_USER } from "../actions/types";
 
 const initialState = {
   userInfo: null,
+  loading: false,
+  error: null,
 };
 
 const userReducer = (state = initialState, action) => {

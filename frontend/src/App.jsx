@@ -10,6 +10,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute"; // Assuming you have a PrivateRoute component
+import "./app.css";
 
 const App = () => {
   return (

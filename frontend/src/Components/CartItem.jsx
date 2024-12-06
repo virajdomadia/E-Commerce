@@ -1,22 +1,23 @@
-import React, { useState } from "react";
+import React from "react";
 import { useDispatch } from "react-redux";
+import { updateCart, removeFromCart } from "../redux/actions/cartActions";
+import "./CartItem.css";
 
 const CartItem = ({ item }) => {
-  const [quantity, setQuantity] = useState(item.quantity);
   const dispatch = useDispatch();
 
-  const handleRemove = () => {
-    dispatch(removeFromCart(item.product));
+  // Handle updating item quantity
+  const handleQuantityChange = (newQuantity) => {
+    if (newQuantity > 0) {
+      dispatch(updateCart(item.product._id, newQuantity)); // Call action to update quantity
+    }
   };
 
-  const handleQuantityChange = (e) => {
-    const newQuantity = e.target.value;
-    if (newQuantity <= 0) {
-      return;
-    }
-    setQuantity(newQuantity);
-    dispatch(updateCartItem(item.product, newQuantity));
+  // Handle removing the item from the cart
+  const handleRemoveItem = () => {
+    dispatch(removeFromCart(item.product._id)); // Call action to remove item
   };
+
   return (
     <div className="cart-item">
       <img
@@ -24,20 +25,27 @@ const CartItem = ({ item }) => {
         alt={item.product.name}
         className="cart-item-image"
       />
+
       <div className="cart-item-details">
         <h4>{item.product.name}</h4>
-        <p>${item.product.price}</p>
-        <input
-          type="number"
-          value={quantity}
-          onChange={handleQuantityChange}
-          min="1"
-          className="cart-item-quantity"
-        />
-        <button onClick={handleRemove} className="cart-item-remove">
-          Remove
+        <p>Price: ${item.product.price}</p>
+        <p>Subtotal: ${(item.product.price * item.quantity).toFixed(2)}</p>
+      </div>
+
+      {/* Quantity controls */}
+      <div className="quantity-controls">
+        <button onClick={() => handleQuantityChange(item.quantity - 1)}>
+          -
+        </button>
+        <span>{item.quantity}</span>
+        <button onClick={() => handleQuantityChange(item.quantity + 1)}>
+          +
         </button>
       </div>
+
+      <button className="remove-button" onClick={handleRemoveItem}>
+        Remove
+      </button>
     </div>
   );
 };

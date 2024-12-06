@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-const CheckoutForm = ({ onsubmit }) => {
+const CheckoutForm = ({ onSubmit }) => {
   const [formData, setFormData] = useState({
     address: "",
     city: "",
@@ -9,7 +9,7 @@ const CheckoutForm = ({ onsubmit }) => {
     paymentMethod: "paypal",
   });
 
-  const handleChenge = (e) => {
+  const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({ ...formData, [name]: value });
   };
