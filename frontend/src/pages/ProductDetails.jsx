@@ -43,7 +43,13 @@ const ProductDetail = () => {
       {product ? (
         <div className="product-detail">
           <div className="product-image">
-            <img src={product.image} alt={product.name} />
+            <img
+              src={
+                product.image ||
+                "https://dummyimage.com/200x200/000/fff.jpg&text=image+placeholder"
+              }
+              alt={product.name}
+            />
           </div>
           <div className="product-info">
             <h2>{product.name}</h2>

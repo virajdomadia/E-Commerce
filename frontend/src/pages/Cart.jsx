@@ -1,53 +1,46 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   addToCart,
   removeFromCart,
   clearCart,
+  updateCart,
 } from "../redux/actions/cartActions";
 import { Link } from "react-router-dom";
+import "./Cart.css";
+import emptyCart from "../assets/Images/empty-cart.png";
+import Checkout from "./Checkout";
 
 const Cart = () => {
   const dispatch = useDispatch();
-
-  // Get cart items from Redux store
-  const cart = useSelector((state) => state.cart.items);
-
-  // Calculate total price
-  const calculateTotal = () => {
-    return cart.reduce(
-      (acc, item) => acc + item.product.price * item.quantity,
-      0
-    );
-  };
-
-  // Remove item from cart
-  const handleRemove = (productId) => {
-    dispatch(removeFromCart(productId));
-  };
-
-  // Update cart quantity
-  const handleQuantityChange = (productId, quantity) => {
-    dispatch(addToCart({ product: productId, quantity }));
-  };
-
-  // Clear the entire cart
-  const handleClearCart = () => {
-    dispatch(clearCart());
-  };
+  const cartItems = useSelector((state) => state.cart.cartItems || []);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (cart.length === 0) {
-      // Redirect to home if the cart is empty (optional)
-    }
-  }, [cart]);
+    setTimeout(() => setLoading(false), 1000);
+  }, []);
+
+  const calculateTotal = () =>
+    cartItems.reduce(
+      (acc, item) => acc + (item.product?.price || 0) * item.quantity,
+      0
+    );
+
+  const handleRemove = (productId) => dispatch(removeFromCart(productId));
+
+  const handleQuantityChange = (productId, quantity) =>
+    quantity > 0 && dispatch(updateCart(productId, quantity));
+
+  const handleClearCart = () => dispatch(clearCart());
+
+  if (loading) return <div className="loading-spinner">Loading...</div>;
 
   return (
     <div className="cart-page">
       <h2>Your Cart</h2>
-
-      {cart.length === 0 ? (
+      {cartItems.length === 0 ? (
         <div>
+          <img src={emptyCart} alt="Empty Cart" className="empty-cart-image" />
           <p>Your cart is empty.</p>
           <Link to="/" className="back-to-home-btn">
             Go back to shopping
@@ -62,29 +55,27 @@ const Cart = () => {
             <span>Total</span>
             <span>Actions</span>
           </div>
-
-          {cart.map((item) => (
-            <div key={item.product._id} className="cart-item">
-              <div className="cart-item-details">
-                <img
-                  src={item.product.image}
-                  alt={item.product.name}
-                  className="cart-item-image"
-                />
-                <Link
-                  to={`/product/${item.product._id}`}
-                  className="cart-item-name"
-                >
-                  {item.product.name}
-                </Link>
-              </div>
-              <div className="cart-item-price">
-                ${item.product.price.toFixed(2)}
-              </div>
-              <div className="cart-item-quantity">
+          {cartItems.map((item, index) => (
+            <div key={item.productId || index} className="cart-item">
+              <img
+                src={
+                  item.product?.image ||
+                  "https://dummyimage.com/200x200/000/fff.jpg&text=image+placeholder"
+                }
+                alt={item.product?.name || "Product"}
+                className="cart-item-image"
+              />
+              <Link
+                to={`/product/${item.productId}`}
+                className="cart-item-name"
+              >
+                {item.product?.name || "Unknown Product"}
+              </Link>
+              <div>₹{item.product?.price?.toFixed(2) || "0.00"}</div>
+              <div>
                 <button
                   onClick={() =>
-                    handleQuantityChange(item.product._id, item.quantity - 1)
+                    handleQuantityChange(item.productId, item.quantity - 1)
                   }
                   disabled={item.quantity <= 1}
                 >
@@ -93,38 +84,24 @@ const Cart = () => {
                 <span>{item.quantity}</span>
                 <button
                   onClick={() =>
-                    handleQuantityChange(item.product._id, item.quantity + 1)
+                    handleQuantityChange(item.productId, item.quantity + 1)
                   }
                 >
                   +
                 </button>
               </div>
-              <div className="cart-item-total">
-                ${(item.product.price * item.quantity).toFixed(2)}
+              <div>
+                ₹{((item.product?.price || 0) * item.quantity).toFixed(2)}
               </div>
-              <div className="cart-item-actions">
-                <button
-                  onClick={() => handleRemove(item.product._id)}
-                  className="remove-btn"
-                >
-                  Remove
-                </button>
-              </div>
+              <button onClick={() => handleRemove(item.productId)}>
+                Remove
+              </button>
             </div>
           ))}
-
           <div className="cart-summary">
-            <div className="total-price">
-              <h3>Total: ${calculateTotal().toFixed(2)}</h3>
-            </div>
-            <div className="cart-actions">
-              <button onClick={handleClearCart} className="clear-cart-btn">
-                Clear Cart
-              </button>
-              <Link to="/checkout" className="checkout-btn">
-                Proceed to Checkout
-              </Link>
-            </div>
+            <h3>Total: ₹{calculateTotal().toFixed(2)}</h3>
+            <button onClick={handleClearCart}>Clear Cart</button>
+            <Link to="/checkout">Checkout</Link>
           </div>
         </div>
       )}

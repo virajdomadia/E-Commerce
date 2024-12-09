@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchProducts } from "../redux/actions/productActions";
 import { Link } from "react-router-dom";
 import { addToCart } from "../redux/actions/cartActions";
+import "./Home.css";
 
 const Home = () => {
   const dispatch = useDispatch();
@@ -34,10 +35,18 @@ const Home = () => {
       <div className="product-list">
         {products.map((product) => (
           <div key={product._id} className="product-card">
-            <img
+            {/* <img
               src={product.image}
               alt={product.name}
               className="product-image"
+            /> */}
+            <img
+              src={
+                product.image ||
+                "https://dummyimage.com/200x200/000/fff.jpg&text=image+placeholder"
+              }
+              alt={product.name || "Product"}
+              className="cart-item-image"
             />
             <div className="product-info">
               <Link to={`/product/${product._id}`} className="product-name">

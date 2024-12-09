@@ -1,163 +1,157 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Link } from "react-router-dom";
-import { clearCart } from "../redux/actions/cartActions";
-import "./Checkout.css";
+import {
+  ADD_TO_CART,
+  REMOVE_FROM_CART,
+  UPDATE_CART,
+} from "../redux/actions/types"; // Import action types
+import { useNavigate } from "react-router-dom"; // Import useNavigate
 
 const Checkout = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate(); // Replace useHistory with useNavigate
 
-  // Get cart items from Redux store
-  const cart = useSelector((state) => state.cart.items);
+  // Get cart items from the Redux store
+  const { cartItems } = useSelector((state) => state.cart);
 
-  // Calculate total price
+  // Local state for user inputs (shipping, payment, etc.)
+  const [shippingAddress, setShippingAddress] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState("PayPal");
+
+  // Calculate the total price of the cart
   const calculateTotal = () => {
-    return cart.reduce(
-      (acc, item) => acc + item.product.price * item.quantity,
+    return cartItems.reduce(
+      (acc, item) => acc + (item.product?.price || 0) * item.quantity, // Use optional chaining here
       0
     );
   };
 
-  // Shipping details state
-  const [shippingAddress, setShippingAddress] = useState({
-    address: "",
-    city: "",
-    postalCode: "",
-    country: "",
-  });
-
-  // Handle input changes
-  const handleInputChange = (e) => {
-    const { name, value } = e.target;
-    setShippingAddress((prevState) => ({
-      ...prevState,
-      [name]: value,
-    }));
+  // Handle item quantity change
+  const handleQuantityChange = (productId, quantity) => {
+    if (quantity <= 0) {
+      dispatch({
+        type: REMOVE_FROM_CART,
+        payload: productId,
+      });
+    } else {
+      dispatch({
+        type: UPDATE_CART,
+        payload: { productId, quantity },
+      });
+    }
   };
 
-  // Handle order submission
-  const handleSubmit = (e) => {
-    e.preventDefault();
+  // Handle item removal from the cart
+  const handleRemoveFromCart = (productId) => {
+    dispatch({
+      type: REMOVE_FROM_CART,
+      payload: productId,
+    });
+  };
 
-    if (
-      !shippingAddress.address ||
-      !shippingAddress.city ||
-      !shippingAddress.postalCode ||
-      !shippingAddress.country
-    ) {
-      alert("Please fill in all shipping details.");
+  // Handle checkout submission (for example, redirect to payment page)
+  const handleCheckout = () => {
+    if (!shippingAddress || !paymentMethod) {
+      alert("Please complete the shipping and payment details.");
       return;
     }
 
-    // Simulate order creation (you can replace this with actual API call)
-    alert("Order placed successfully!");
-
-    // Clear the cart after order is placed
-    dispatch(clearCart());
-
-    // Redirect to order confirmation page (optional)
+    // Handle checkout logic (e.g., create order, redirect, etc.)
+    // You might want to send an API request to create an order
+    navigate("/payment"); // Use navigate to redirect to payment page
   };
 
-  useEffect(() => {
-    if (cart.length === 0) {
-      // Redirect to home page if the cart is empty (optional)
-    }
-  }, [cart]);
-
   return (
-    <div className="checkout-page">
-      <h2>Checkout</h2>
+    <div>
+      <h1>Checkout</h1>
 
-      {cart.length === 0 ? (
-        <div>
-          <p>Your cart is empty.</p>
-          <Link to="/" className="back-to-home-btn">
-            Go back to shopping
-          </Link>
-        </div>
-      ) : (
-        <div className="checkout-container">
-          <div className="checkout-items">
-            <h3>Order Summary</h3>
-            {cart.map((item) => (
-              <div key={item.product._id} className="checkout-item">
-                <img
-                  src={item.product.image}
-                  alt={item.product.name}
-                  className="checkout-item-image"
-                />
-                <div className="checkout-item-details">
-                  <Link
-                    to={`/product/${item.product._id}`}
-                    className="checkout-item-name"
-                  >
-                    {item.product.name}
-                  </Link>
-                  <span>Quantity: {item.quantity}</span>
-                  <span>Price: ${item.product.price.toFixed(2)}</span>
+      {/* Cart Items */}
+      <div>
+        <h2>Your Cart</h2>
+        {cartItems.length === 0 ? (
+          <p>Your cart is empty</p>
+        ) : (
+          <div>
+            {cartItems.map((item) => (
+              <div key={item.product?._id}>
+                <div>
+                  <h3>{item.product?.name || "Product Name Not Available"}</h3>{" "}
+                  {/* Optional chaining */}
+                  <p>{item.product?.price || "Price not available"} USD</p>{" "}
+                  {/* Optional chaining */}
+                  <div>
+                    <button
+                      onClick={() =>
+                        handleQuantityChange(
+                          item.product?._id,
+                          item.quantity - 1
+                        )
+                      }
+                    >
+                      -
+                    </button>
+                    <input
+                      type="number"
+                      value={item.quantity}
+                      onChange={(e) =>
+                        handleQuantityChange(
+                          item.product?._id,
+                          parseInt(e.target.value)
+                        )
+                      }
+                    />
+                    <button
+                      onClick={() =>
+                        handleQuantityChange(
+                          item.product?._id,
+                          item.quantity + 1
+                        )
+                      }
+                    >
+                      +
+                    </button>
+                    <button
+                      onClick={() => handleRemoveFromCart(item.product?._id)}
+                    >
+                      Remove
+                    </button>
+                  </div>
                 </div>
               </div>
             ))}
-
-            <div className="total-price">
-              <h4>Total: ${calculateTotal().toFixed(2)}</h4>
-            </div>
           </div>
+        )}
+      </div>
 
-          <div className="checkout-form">
-            <h3>Shipping Details</h3>
-            <form onSubmit={handleSubmit}>
-              <label>
-                Address:
-                <input
-                  type="text"
-                  name="address"
-                  value={shippingAddress.address}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
+      {/* Shipping Details */}
+      <div>
+        <h2>Shipping Information</h2>
+        <input
+          type="text"
+          placeholder="Shipping Address"
+          value={shippingAddress}
+          onChange={(e) => setShippingAddress(e.target.value)}
+        />
+      </div>
 
-              <label>
-                City:
-                <input
-                  type="text"
-                  name="city"
-                  value={shippingAddress.city}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
+      {/* Payment Method */}
+      <div>
+        <h2>Payment Method</h2>
+        <select
+          value={paymentMethod}
+          onChange={(e) => setPaymentMethod(e.target.value)}
+        >
+          <option value="PayPal">PayPal</option>
+          <option value="Credit Card">Credit Card</option>
+        </select>
+      </div>
 
-              <label>
-                Postal Code:
-                <input
-                  type="text"
-                  name="postalCode"
-                  value={shippingAddress.postalCode}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-
-              <label>
-                Country:
-                <input
-                  type="text"
-                  name="country"
-                  value={shippingAddress.country}
-                  onChange={handleInputChange}
-                  required
-                />
-              </label>
-
-              <button type="submit" className="submit-order-btn">
-                Place Order
-              </button>
-            </form>
-          </div>
-        </div>
-      )}
+      {/* Order Summary */}
+      <div>
+        <h2>Order Summary</h2>
+        <p>Total: {calculateTotal()} USD</p>
+        <button onClick={handleCheckout}>Proceed to Checkout</button>
+      </div>
     </div>
   );
 };

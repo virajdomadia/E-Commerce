@@ -8,7 +8,7 @@ export const fetchProducts = () => async (dispatch) => {
   dispatch({ type: FETCH_PRODUCTS_LOADING }); // Dispatch loading state
 
   try {
-    const response = await fetch("/api/products"); // API call to fetch products
+    const response = await fetch("http://localhost:5000/api/products"); // API call to fetch products
 
     // Check if the response is successful
     if (!response.ok) {

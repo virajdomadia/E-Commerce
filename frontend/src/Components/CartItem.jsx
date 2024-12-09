@@ -21,8 +21,11 @@ const CartItem = ({ item }) => {
   return (
     <div className="cart-item">
       <img
-        src={item.product.image}
-        alt={item.product.name}
+        src={
+          item.product.image ||
+          "https://dummyimage.com/200x200/000/fff.jpg&text=image+placeholder"
+        }
+        alt={item.product.name || "Product"}
         className="cart-item-image"
       />
 
