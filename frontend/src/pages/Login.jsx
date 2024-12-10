@@ -24,7 +24,7 @@ const Login = () => {
 
     // Simulate login API call (replace with actual API call)
     try {
-      const response = await fetch("/api/auth/login", {
+      const response = await fetch("/api/users/login", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

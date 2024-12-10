@@ -15,7 +15,12 @@ connectDB();
 const app = express();
 
 app.use(express.json());
-app.use(cors());
+const corsOptions = {
+  origin: "http://localhost:5173", // React frontend URL
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+};
+app.use(cors(corsOptions));
 
 app.use("/api/users", userRoutes); // User routes
 app.use("/api/products", productRoutes); // Product routes

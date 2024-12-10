@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { useNavigate } from "react-router-dom";
 import { signup } from "../redux/actions/userActions";
+import { useNavigate } from "react-router-dom";
 import "./SignupForm.css";
 
 const SignupForm = () => {
