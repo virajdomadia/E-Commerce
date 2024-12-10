@@ -11,12 +11,10 @@ router.post("/", protect, async (req, res) => {
 
   // Ensure that required fields are provided
   if (!items || !totalPrice || !shippingAddress || !paymentMethod) {
-    return res
-      .status(400)
-      .json({
-        message:
-          "Items, total price, shipping address, and payment method are required",
-      });
+    return res.status(400).json({
+      message:
+        "Items, total price, shipping address, and payment method are required",
+    });
   }
 
   try {
