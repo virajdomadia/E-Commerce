@@ -7,6 +7,7 @@ const userRoutes = require("./routes/userRoutes");
 const productRoutes = require("./routes/productRoutes");
 const cartRoutes = require("./routes/cartRoutes");
 const orderRoutes = require("./routes/orderRoutes");
+const paymentRoutes = require("./routes/payment");
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use("/api/users", userRoutes); // User routes
 app.use("/api/products", productRoutes); // Product routes
 app.use("/api/cart", cartRoutes); // Cart routes
 app.use("/api/orders", orderRoutes); // Order routes
+app.use("/api/payment", paymentRoutes);
 
 app.use((err, req, res, next) => {
   const statusCode = res.statusCode === 200 ? 500 : res.statusCode;

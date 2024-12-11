@@ -10,6 +10,7 @@ import ProductDetails from "./pages/ProductDetails";
 import Checkout from "./pages/Checkout";
 import Profile from "./pages/Profile";
 import PrivateRoute from "./components/PrivateRoute"; // Assuming you have a PrivateRoute component
+import RazorpayCheckout from "./components/RazorpayCheckout";
 import "./app.css";
 
 const App = () => {
@@ -39,6 +40,14 @@ const App = () => {
             }
           />
           <Route path="/product/:id" element={<ProductDetails />} />
+          <Route
+            path="/payment"
+            element={
+              <PrivateRoute>
+                <RazorpayCheckout /> {/* Razorpay payment button */}
+              </PrivateRoute>
+            }
+          />
         </Routes>
       </div>
       <Footer />

@@ -16,7 +16,7 @@ const Checkout = () => {
 
   // Local state for user inputs (shipping, payment, etc.)
   const [shippingAddress, setShippingAddress] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState("PayPal");
+  const [paymentMethod, setPaymentMethod] = useState("Razorpay");
 
   // Calculate the total price of the cart
   const calculateTotal = () => {
@@ -49,16 +49,70 @@ const Checkout = () => {
     });
   };
 
-  // Handle checkout submission (for example, redirect to payment page)
-  const handleCheckout = () => {
-    if (!shippingAddress || !paymentMethod) {
-      alert("Please complete the shipping and payment details.");
+  // Function to create Razorpay order on your backend
+  const createRazorpayOrder = async () => {
+    const orderData = {
+      amount: calculateTotal() * 100, // Amount in paise (e.g., $10 = 1000 paise)
+      shippingAddress,
+    };
+
+    const response = await fetch("/api/payment/create-order", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(orderData),
+    });
+
+    const order = await response.json();
+    return order;
+  };
+
+  // Function to handle payment through Razorpay
+  const handleRazorpayPayment = async () => {
+    if (!shippingAddress) {
+      alert("Please complete the shipping details.");
       return;
     }
 
-    // Handle checkout logic (e.g., create order, redirect, etc.)
-    // You might want to send an API request to create an order
-    navigate("/payment"); // Use navigate to redirect to payment page
+    try {
+      // Step 1: Create Razorpay order on backend
+      const order = await createRazorpayOrder();
+
+      // Step 2: Trigger Razorpay Checkout
+      const options = {
+        key: "YOUR_RAZORPAY_KEY_ID", // Replace with your Razorpay Test Key ID
+        amount: order.amount, // Amount in paise
+        currency: "INR",
+        name: "Your Company",
+        description: "Test Transaction",
+        order_id: order.id, // Razorpay Order ID
+        handler: async function (response) {
+          const verifyResponse = await fetch("/api/payment/verify-payment", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+            }),
+          });
+
+          const verifyData = await verifyResponse.json();
+          if (verifyData.success) {
+            alert("Payment Successful!");
+            navigate("/order-success"); // Redirect to order success page
+          } else {
+            alert("Payment Verification Failed!");
+          }
+        },
+        theme: { color: "#3399cc" },
+      };
+
+      const razorpay = new window.Razorpay(options);
+      razorpay.open();
+    } catch (error) {
+      console.error("Error initiating payment:", error);
+      alert("Payment Failed! Please try again.");
+    }
   };
 
   return (
@@ -75,10 +129,8 @@ const Checkout = () => {
             {cartItems.map((item) => (
               <div key={item.product?._id}>
                 <div>
-                  <h3>{item.product?.name || "Product Name Not Available"}</h3>{" "}
-                  {/* Optional chaining */}
-                  <p>{item.product?.price || "Price not available"} USD</p>{" "}
-                  {/* Optional chaining */}
+                  <h3>{item.product?.name || "Product Name Not Available"}</h3>
+                  <p>{item.product?.price || "Price not available"} USD</p>
                   <div>
                     <button
                       onClick={() =>
@@ -134,23 +186,17 @@ const Checkout = () => {
         />
       </div>
 
-      {/* Payment Method */}
+      {/* Payment Method (Now only Razorpay) */}
       <div>
         <h2>Payment Method</h2>
-        <select
-          value={paymentMethod}
-          onChange={(e) => setPaymentMethod(e.target.value)}
-        >
-          <option value="PayPal">PayPal</option>
-          <option value="Credit Card">Credit Card</option>
-        </select>
+        <p>Payment Method: Razorpay</p>
       </div>
 
       {/* Order Summary */}
       <div>
         <h2>Order Summary</h2>
         <p>Total: {calculateTotal()} USD</p>
-        <button onClick={handleCheckout}>Proceed to Checkout</button>
+        <button onClick={handleRazorpayPayment}>Pay with Razorpay</button>
       </div>
     </div>
   );
