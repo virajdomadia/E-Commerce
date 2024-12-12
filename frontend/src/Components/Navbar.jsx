@@ -43,6 +43,7 @@ const Navbar = () => {
             Cart
           </NavLink>
         </li>
+
         {userInfo ? (
           <>
             <li>
@@ -53,6 +54,17 @@ const Navbar = () => {
                 Profile
               </NavLink>
             </li>
+            {/* Admin link - only visible if the user is an admin */}
+            {userInfo.isAdmin && (
+              <li>
+                <NavLink
+                  to="/admin/dashboard"
+                  className={({ isActive }) => (isActive ? "active" : "")}
+                >
+                  Admin Dashboard
+                </NavLink>
+              </li>
+            )}
             <li>
               <button className="logout-button" onClick={handleLogout}>
                 Logout

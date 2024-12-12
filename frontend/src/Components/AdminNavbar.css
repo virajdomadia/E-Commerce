@@ -1,0 +1,32 @@
+/* AdminNavbar CSS */
+.admin-navbar {
+    background-color: #333;
+    padding: 10px;
+}
+
+.admin-navbar ul {
+    display: flex;
+    justify-content: space-around;
+    list-style: none;
+    padding: 0;
+}
+
+.admin-navbar li {
+    color: white;
+}
+
+.admin-navbar a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+}
+
+.admin-navbar a:hover {
+    color: #f0a500;
+}
+
+/* Active link styling */
+.active-link {
+    color: #f0a500;
+    font-weight: bold;
+}

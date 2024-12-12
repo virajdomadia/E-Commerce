@@ -7,6 +7,13 @@ const router = express.Router();
 router.post("/", adminMiddleware, async (req, res) => {
   const { name, description, price, image, category, stock } = req.body;
 
+  // Basic validation
+  if (!name || !price || !category) {
+    return res
+      .status(400)
+      .json({ message: "Name, price, and category are required." });
+  }
+
   try {
     // Create a new product object
     const newProduct = new Product({
@@ -81,9 +88,12 @@ router.delete("/:id", adminMiddleware, async (req, res) => {
 
 // Route to get all products (anyone can view)
 router.get("/", async (req, res) => {
+  const page = parseInt(req.query.page) || 1;
+  const limit = parseInt(req.query.limit) || 10;
+  const skip = (page - 1) * limit;
   try {
     // Fetch all products from the database
-    const products = await Product.find();
+    const products = await Product.find().skip(skip).limit(limit);
 
     // Return the list of products as the response
     res.status(200).json(products);

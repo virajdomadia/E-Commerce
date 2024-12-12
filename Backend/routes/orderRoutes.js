@@ -1,6 +1,7 @@
 const express = require("express");
 const Order = require("../models/Order");
 const protect = require("../middleware/authMiddleware");
+const adminMiddleware = require("../middleware/adminMiddleware");
 
 const router = express.Router();
 
@@ -36,7 +37,7 @@ router.post("/", protect, async (req, res) => {
 });
 
 // Fetch all orders (admin only)
-router.get("/", protect, async (req, res) => {
+router.get("/", protect, adminMiddleware, async (req, res) => {
   try {
     const orders = await Order.find().populate("user", "name email");
     res.status(200).json({ orders });
@@ -55,6 +56,25 @@ router.get("/user", protect, async (req, res) => {
       "name email"
     );
     res.status(200).json({ orders });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+router.put("/:id/status", adminMiddleware, async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body; // e.g., "Shipped", "Delivered"
+
+  try {
+    const order = await Order.findById(id);
+    if (!order) {
+      return res.status(404).json({ message: "Order not found" });
+    }
+
+    order.status = status; // Update the status
+    await order.save();
+
+    res.status(200).json({ message: "Order status updated", order });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
