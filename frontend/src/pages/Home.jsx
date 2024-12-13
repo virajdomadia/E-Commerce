@@ -8,25 +8,36 @@ import "./Home.css";
 const Home = () => {
   const dispatch = useDispatch();
 
-  // Fetch products from the Redux store
   const { products, loading, error } = useSelector((state) => state.products);
 
-  // Fetch the products on component mount
   useEffect(() => {
     dispatch(fetchProducts());
   }, [dispatch]);
 
-  // Handle adding a product to the cart
   const handleAddToCart = (productId) => {
     dispatch(addToCart(productId, 1)); // Adding 1 by default, can adjust for quantity
   };
 
   if (loading) {
-    return <div className="loading">Loading products...</div>;
+    return (
+      <div className="loading">
+        <div className="spinner"></div> {/* Add your spinner here */}
+        Loading products...
+      </div>
+    );
   }
 
   if (error) {
-    return <div className="error">Error: {error}</div>;
+    return (
+      <div className="error">
+        Error: {error}{" "}
+        <button onClick={() => dispatch(fetchProducts())}>Retry</button>
+      </div>
+    );
+  }
+
+  if (products.length === 0) {
+    return <div>No products available at the moment.</div>;
   }
 
   return (
@@ -35,17 +46,9 @@ const Home = () => {
       <div className="product-list">
         {products.map((product) => (
           <div key={product._id} className="product-card">
-            {/* <img
+            <img
               src={product.image}
               alt={product.name}
-              className="product-image"
-            /> */}
-            <img
-              src={
-                product.image ||
-                "https://dummyimage.com/200x200/000/fff.jpg&text=image+placeholder"
-              }
-              alt={product.name || "Product"}
               className="cart-item-image"
             />
             <div className="product-info">
@@ -53,7 +56,9 @@ const Home = () => {
                 {product.name}
               </Link>
               <p className="product-description">{product.description}</p>
-              <span className="product-price">${product.price}</span>
+              <span className="product-price">
+                ₹{product.price?.toFixed(2) || "0.00"}
+              </span>
               <button
                 className="add-to-cart-btn"
                 onClick={() => handleAddToCart(product._id)}

@@ -48,7 +48,7 @@ const Navbar = () => {
           <>
             <li>
               <NavLink
-                to="/profile"
+                to={userInfo.isAdmin ? "/admin/profile" : "/profile"}
                 className={({ isActive }) => (isActive ? "active" : "")}
               >
                 Profile

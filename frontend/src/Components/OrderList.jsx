@@ -1,6 +1,18 @@
 import React from "react";
 
-const OrderList = ({ orders, onStatusChange }) => {
+const OrderList = ({ orders, onStatusChange, loading, error }) => {
+  if (loading) return <p>Loading orders...</p>;
+  if (error) return <p>Error fetching orders: {error.message}</p>;
+
+  const handleStatusChange = (orderId, newStatus) => {
+    if (
+      window.confirm(
+        `Are you sure you want to change the status to ${newStatus}?`
+      )
+    ) {
+      onStatusChange(orderId, newStatus);
+    }
+  };
   return (
     <div>
       <h2>Order List</h2>
@@ -22,7 +34,9 @@ const OrderList = ({ orders, onStatusChange }) => {
               <td>
                 <select
                   value={order.status}
-                  onChange={(e) => onStatusChange(order._id, e.target.value)}
+                  onChange={(e) =>
+                    handleStatusChange(order._id, e.target.value)
+                  }
                 >
                   <option value="pending">Pending</option>
                   <option value="shipped">Shipped</option>

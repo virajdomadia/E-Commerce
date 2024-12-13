@@ -36,16 +36,6 @@ router.post("/", protect, async (req, res) => {
   }
 });
 
-// Fetch all orders (admin only)
-router.get("/", protect, adminMiddleware, async (req, res) => {
-  try {
-    const orders = await Order.find().populate("user", "name email");
-    res.status(200).json({ orders });
-  } catch (err) {
-    res.status(500).json({ message: "Server error", error: err.message });
-  }
-});
-
 // Fetch user's orders
 router.get("/user", protect, async (req, res) => {
   const userId = req.user._id; // Get user ID from the authenticated user

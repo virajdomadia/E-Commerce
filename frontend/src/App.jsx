@@ -1,5 +1,6 @@
-import React from "react";
+import React, { useEffect } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { useDispatch } from "react-redux"; // Import useDispatch from react-redux
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
@@ -13,9 +14,16 @@ import PrivateRoute from "./components/PrivateRoute"; // Assuming you have a Pri
 import RazorpayCheckout from "./components/RazorpayCheckout";
 import ManageProducts from "./pages/ManageProducts"; // Import Manage Products Page
 import ManageOrders from "./pages/ManageOrders"; // Import Manage Orders Page
+import { autoLogin } from "./redux/actions/userActions"; // Import the autoLogin action
 import "./app.css";
 
 const App = () => {
+  const dispatch = useDispatch(); // Initialize the dispatch function
+
+  useEffect(() => {
+    dispatch(autoLogin()); // Dispatch autoLogin action to authenticate the user
+  }, [dispatch]); // Only runs on initial render (when dispatch is available)
+
   return (
     <Router>
       <Navbar />

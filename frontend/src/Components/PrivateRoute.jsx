@@ -5,16 +5,17 @@ const PrivateRoute = ({ element: Component, isAdmin, ...rest }) => {
   const userLogin = useSelector((state) => state.userLogin);
   const { userInfo } = userLogin || {}; // Safely destructure userInfo
 
-  // Check if user is logged in and is an admin (if isAdmin prop is passed)
+  // Check if user is logged in
   if (!userInfo) {
     return <Navigate to="/login" />;
   }
 
+  // Check if the user is admin (if isAdmin prop is passed)
   if (isAdmin && !userInfo.isAdmin) {
-    return <Navigate to="/login" />; // Redirect non-admin users to login
+    return <Navigate to="/not-authorized" />;
   }
 
-  // If the user is logged in and is an admin (if applicable), render the protected component
+  // Render the protected component
   return <Component {...rest} />;
 };
 

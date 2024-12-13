@@ -10,6 +10,7 @@ const ProductDetail = () => {
   const [product, setProduct] = useState(null);
   const [quantity, setQuantity] = useState(1);
   const [error, setError] = useState(null);
+  const [loading, setLoading] = useState(true); // Loading state for product details
 
   useEffect(() => {
     // Fetch product details by productId
@@ -25,6 +26,8 @@ const ProductDetail = () => {
         }
       } catch (err) {
         setError("An error occurred while fetching product details.");
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -32,10 +35,20 @@ const ProductDetail = () => {
   }, [productId]);
 
   const handleAddToCart = () => {
-    if (product) {
+    if (product && quantity > 0 && quantity <= product.stock) {
       dispatch(addToCart({ ...product, quantity }));
     }
   };
+
+  const handleQuantityChange = (e) => {
+    let value = Math.max(1, e.target.value); // Ensure quantity is at least 1
+    value = value > product.stock ? product.stock : value; // Don't exceed stock
+    setQuantity(value);
+  };
+
+  if (loading) {
+    return <p>Loading product details...</p>;
+  }
 
   return (
     <div className="product-detail-page">
@@ -55,23 +68,29 @@ const ProductDetail = () => {
             <h2>{product.name}</h2>
             <p className="product-description">{product.description}</p>
             <p className="product-price">${product.price}</p>
+            <p className="product-stock">Stock: {product.stock}</p>
             <div className="quantity-selector">
               <label htmlFor="quantity">Quantity: </label>
               <input
                 type="number"
                 id="quantity"
                 min="1"
+                max={product.stock}
                 value={quantity}
-                onChange={(e) => setQuantity(e.target.value)}
+                onChange={handleQuantityChange}
               />
             </div>
-            <button onClick={handleAddToCart} className="add-to-cart-btn">
-              Add to Cart
+            <button
+              onClick={handleAddToCart}
+              className="add-to-cart-btn"
+              disabled={product.stock === 0 || quantity <= 0}
+            >
+              {product.stock === 0 ? "Out of Stock" : "Add to Cart"}
             </button>
           </div>
         </div>
       ) : (
-        <p>Loading product details...</p>
+        <p>No product details available.</p>
       )}
     </div>
   );

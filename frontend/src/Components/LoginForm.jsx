@@ -1,14 +1,17 @@
 import React, { useState } from "react";
 import { useDispatch } from "react-redux";
-import { login } from "../redux/actions/userActions";
+import { useNavigate } from "react-router-dom";
+import { login } from "../redux/actions/userActions"; // Modify this action accordingly
 import "./LoginForm.css";
 
 const LoginForm = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [isAdmin, setIsAdmin] = useState(false); // State to check if it's admin login
   const [error, setError] = useState(null);
 
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -19,7 +22,20 @@ const LoginForm = () => {
     }
 
     setError(null);
-    dispatch(login(email, password));
+
+    const action = isAdmin ? "adminLogin" : "userLogin"; // Determine if admin or user
+
+    dispatch(login({ email, password, isAdmin }))
+      .then(() => {
+        if (isAdmin) {
+          navigate("/admin/dashboard"); // Redirect to Admin Dashboard
+        } else {
+          navigate("/"); // Redirect to User Homepage or Dashboard
+        }
+      })
+      .catch((err) => {
+        setError("Invalid credentials");
+      });
   };
 
   return (
@@ -47,6 +63,18 @@ const LoginForm = () => {
             onChange={(e) => setPassword(e.target.value)}
           />
         </div>
+
+        <div className="form-group">
+          <label>
+            <input
+              type="checkbox"
+              checked={isAdmin}
+              onChange={() => setIsAdmin(!isAdmin)}
+            />
+            Admin Login
+          </label>
+        </div>
+
         <button type="submit" className="login-button">
           Login
         </button>

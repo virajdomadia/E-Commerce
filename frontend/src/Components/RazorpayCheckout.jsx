@@ -1,10 +1,11 @@
-// src/components/RazorpayCheckout.jsx
-import React from "react";
+import React, { useState } from "react";
 
 const RazorpayCheckout = () => {
   const createOrderAPI = "http://localhost:5000/api/payment/create-order"; // Replace with your backend API
   const verifyPaymentAPI = "http://localhost:5000/api/payment/verify-payment"; // Replace with your backend API
   const razorpayTestKey = "rzp_test_lPRyx2UFEHSZNb"; // Replace with your Razorpay Test Key ID
+
+  const [loading, setLoading] = useState(false);
 
   const loadRazorpayScript = () => {
     return new Promise((resolve) => {
@@ -17,10 +18,12 @@ const RazorpayCheckout = () => {
   };
 
   const handlePayment = async () => {
-    const isScriptLoaded = await loadRazorpayScript();
+    setLoading(true);
 
+    const isScriptLoaded = await loadRazorpayScript();
     if (!isScriptLoaded) {
       alert("Failed to load Razorpay SDK. Please try again.");
+      setLoading(false);
       return;
     }
 
@@ -33,6 +36,12 @@ const RazorpayCheckout = () => {
       });
 
       const orderData = await orderResponse.json();
+
+      if (!orderData || !orderData.id) {
+        alert("Failed to create order. Please try again.");
+        setLoading(false);
+        return;
+      }
 
       // Step 2: Configure Razorpay Checkout
       const options = {
@@ -61,6 +70,7 @@ const RazorpayCheckout = () => {
           } else {
             alert("Payment Verification Failed!");
           }
+          setLoading(false);
         },
         theme: { color: "#3399cc" },
       };
@@ -70,13 +80,14 @@ const RazorpayCheckout = () => {
     } catch (error) {
       console.error("Error during payment:", error);
       alert("Payment failed. Please try again.");
+      setLoading(false);
     }
   };
 
   return (
     <div>
-      <button onClick={handlePayment} style={styles.button}>
-        Pay Now
+      <button onClick={handlePayment} style={styles.button} disabled={loading}>
+        {loading ? "Processing..." : "Pay Now"}
       </button>
     </div>
   );

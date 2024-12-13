@@ -1,58 +1,40 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  ADD_TO_CART,
-  REMOVE_FROM_CART,
-  UPDATE_CART,
-} from "../redux/actions/types"; // Import action types
-import { useNavigate } from "react-router-dom"; // Import useNavigate
+import { removeFromCart, updateCart } from "../redux/actions/cartActions";
+import { useNavigate } from "react-router-dom";
 
 const Checkout = () => {
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Replace useHistory with useNavigate
+  const navigate = useNavigate();
 
-  // Get cart items from the Redux store
   const { cartItems } = useSelector((state) => state.cart);
 
-  // Local state for user inputs (shipping, payment, etc.)
   const [shippingAddress, setShippingAddress] = useState("");
   const [paymentMethod, setPaymentMethod] = useState("Razorpay");
+  const [loading, setLoading] = useState(false); // For loading state during payment process
 
-  // Calculate the total price of the cart
   const calculateTotal = () => {
     return cartItems.reduce(
-      (acc, item) => acc + (item.product?.price || 0) * item.quantity, // Use optional chaining here
+      (acc, item) => acc + (item.product?.price || 0) * item.quantity,
       0
     );
   };
 
-  // Handle item quantity change
   const handleQuantityChange = (productId, quantity) => {
     if (quantity <= 0) {
-      dispatch({
-        type: REMOVE_FROM_CART,
-        payload: productId,
-      });
+      dispatch(removeFromCart(productId)); // Dispatch the remove action
     } else {
-      dispatch({
-        type: UPDATE_CART,
-        payload: { productId, quantity },
-      });
+      dispatch(updateCart(productId, quantity)); // Dispatch the update action
     }
   };
 
-  // Handle item removal from the cart
   const handleRemoveFromCart = (productId) => {
-    dispatch({
-      type: REMOVE_FROM_CART,
-      payload: productId,
-    });
+    dispatch(removeFromCart(productId)); // Dispatch the remove action
   };
 
-  // Function to create Razorpay order on your backend
   const createRazorpayOrder = async () => {
     const orderData = {
-      amount: calculateTotal() * 100, // Amount in paise (e.g., $10 = 1000 paise)
+      amount: calculateTotal() * 100, // Amount in paise
       shippingAddress,
     };
 
@@ -62,11 +44,14 @@ const Checkout = () => {
       body: JSON.stringify(orderData),
     });
 
+    if (!response.ok) {
+      throw new Error("Failed to create Razorpay order");
+    }
+
     const order = await response.json();
     return order;
   };
 
-  // Function to handle payment through Razorpay
   const handleRazorpayPayment = async () => {
     if (!shippingAddress) {
       alert("Please complete the shipping details.");
@@ -74,17 +59,17 @@ const Checkout = () => {
     }
 
     try {
-      // Step 1: Create Razorpay order on backend
+      setLoading(true); // Set loading state before payment starts
+
       const order = await createRazorpayOrder();
 
-      // Step 2: Trigger Razorpay Checkout
       const options = {
-        key: "YOUR_RAZORPAY_KEY_ID", // Replace with your Razorpay Test Key ID
-        amount: order.amount, // Amount in paise
+        key: "YOUR_RAZORPAY_KEY_ID",
+        amount: order.amount,
         currency: "INR",
         name: "Your Company",
         description: "Test Transaction",
-        order_id: order.id, // Razorpay Order ID
+        order_id: order.id,
         handler: async function (response) {
           const verifyResponse = await fetch("/api/payment/verify-payment", {
             method: "POST",
@@ -99,7 +84,7 @@ const Checkout = () => {
           const verifyData = await verifyResponse.json();
           if (verifyData.success) {
             alert("Payment Successful!");
-            navigate("/order-success"); // Redirect to order success page
+            navigate("/order-success");
           } else {
             alert("Payment Verification Failed!");
           }
@@ -112,6 +97,8 @@ const Checkout = () => {
     } catch (error) {
       console.error("Error initiating payment:", error);
       alert("Payment Failed! Please try again.");
+    } finally {
+      setLoading(false); // Reset loading state after payment attempt
     }
   };
 
@@ -123,14 +110,19 @@ const Checkout = () => {
       <div>
         <h2>Your Cart</h2>
         {cartItems.length === 0 ? (
-          <p>Your cart is empty</p>
+          <p>
+            Your cart is empty. <a href="/">Go shopping</a>
+          </p>
         ) : (
           <div>
             {cartItems.map((item) => (
               <div key={item.product?._id}>
                 <div>
                   <h3>{item.product?.name || "Product Name Not Available"}</h3>
-                  <p>{item.product?.price || "Price not available"} USD</p>
+                  <p>
+                    {item.product?.price?.toFixed(2) || "Price not available"}{" "}
+                    USD
+                  </p>
                   <div>
                     <button
                       onClick={() =>
@@ -186,7 +178,7 @@ const Checkout = () => {
         />
       </div>
 
-      {/* Payment Method (Now only Razorpay) */}
+      {/* Payment Method */}
       <div>
         <h2>Payment Method</h2>
         <p>Payment Method: Razorpay</p>
@@ -195,8 +187,10 @@ const Checkout = () => {
       {/* Order Summary */}
       <div>
         <h2>Order Summary</h2>
-        <p>Total: {calculateTotal()} USD</p>
-        <button onClick={handleRazorpayPayment}>Pay with Razorpay</button>
+        <p>Total: ₹{calculateTotal().toFixed(2)}</p>
+        <button onClick={handleRazorpayPayment} disabled={loading}>
+          {loading ? "Processing..." : "Pay with Razorpay"}
+        </button>
       </div>
     </div>
   );

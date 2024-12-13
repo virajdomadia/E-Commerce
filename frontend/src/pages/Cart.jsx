@@ -17,7 +17,7 @@ const Cart = () => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    setTimeout(() => setLoading(false), 1000);
+    setTimeout(() => setLoading(false), 1000); // Mock loading, replace with real API call if needed
   }, []);
 
   const calculateTotal = () =>
@@ -41,7 +41,7 @@ const Cart = () => {
       {cartItems.length === 0 ? (
         <div>
           <img src={emptyCart} alt="Empty Cart" className="empty-cart-image" />
-          <p>Your cart is empty.</p>
+          <p>Your cart is empty. Why not check out our latest products?</p>
           <Link to="/" className="back-to-home-btn">
             Go back to shopping
           </Link>
@@ -101,7 +101,7 @@ const Cart = () => {
           <div className="cart-summary">
             <h3>Total: ₹{calculateTotal().toFixed(2)}</h3>
             <button onClick={handleClearCart}>Clear Cart</button>
-            <Link to="/checkout">Checkout</Link>
+            <Link to="/checkout">Proceed to Checkout</Link>
           </div>
         </div>
       )}

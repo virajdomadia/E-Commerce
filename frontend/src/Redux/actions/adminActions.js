@@ -17,7 +17,7 @@ import {
   ADMIN_PRODUCT_UPDATE_REQUEST,
   ADMIN_PRODUCT_UPDATE_SUCCESS,
   ADMIN_PRODUCT_UPDATE_FAIL,
-} from "../types";
+} from "./types";
 
 // Helper function for authorization headers
 const getAuthConfig = (getState) => {
@@ -35,7 +35,7 @@ export const getAdminProducts = () => async (dispatch) => {
   try {
     dispatch({ type: ADMIN_PRODUCT_LIST_REQUEST });
 
-    const { data } = await axios.get("/api/products/admin");
+    const { data } = await axios.get("/api/admin/products"); // Updated endpoint
     dispatch({ type: ADMIN_PRODUCT_LIST_SUCCESS, payload: data });
   } catch (error) {
     dispatch({
@@ -48,7 +48,7 @@ export const getAdminProducts = () => async (dispatch) => {
 // Delete a product
 export const deleteProduct = (id) => async (dispatch) => {
   try {
-    await axios.delete(`/api/products/${id}`);
+    await axios.delete(`/api/admin/products/${id}`); // Updated endpoint
     dispatch({ type: ADMIN_PRODUCT_DELETE_SUCCESS, payload: id });
   } catch (error) {
     dispatch({
@@ -64,7 +64,7 @@ export const addProduct = (product) => async (dispatch, getState) => {
     dispatch({ type: ADMIN_PRODUCT_ADD_REQUEST });
 
     const config = getAuthConfig(getState);
-    const { data } = await axios.post("/api/products", product, config);
+    const { data } = await axios.post("/api/admin/products", product, config); // Updated endpoint
 
     dispatch({ type: ADMIN_PRODUCT_ADD_SUCCESS, payload: data });
   } catch (error) {
@@ -81,7 +81,11 @@ export const updateProduct = (id, product) => async (dispatch, getState) => {
     dispatch({ type: ADMIN_PRODUCT_UPDATE_REQUEST });
 
     const config = getAuthConfig(getState);
-    const { data } = await axios.put(`/api/products/${id}`, product, config);
+    const { data } = await axios.put(
+      `/api/admin/products/${id}`,
+      product,
+      config
+    ); // Updated endpoint
 
     dispatch({ type: ADMIN_PRODUCT_UPDATE_SUCCESS, payload: data });
   } catch (error) {
@@ -92,13 +96,13 @@ export const updateProduct = (id, product) => async (dispatch, getState) => {
   }
 };
 
-// Fetch all orders
+// Fetch all orders (for admin)
 export const getAdminOrders = () => async (dispatch, getState) => {
   try {
     dispatch({ type: ADMIN_ORDER_LIST_REQUEST });
 
     const config = getAuthConfig(getState);
-    const { data } = await axios.get("/api/orders", config);
+    const { data } = await axios.get("/api/admin/orders", config); // Updated endpoint
 
     dispatch({ type: ADMIN_ORDER_LIST_SUCCESS, payload: data });
   } catch (error) {
@@ -109,7 +113,7 @@ export const getAdminOrders = () => async (dispatch, getState) => {
   }
 };
 
-// Update order status
+// Update order status (for admin)
 export const updateOrderStatus =
   (orderId, status) => async (dispatch, getState) => {
     try {
@@ -117,10 +121,10 @@ export const updateOrderStatus =
 
       const config = getAuthConfig(getState);
       const { data } = await axios.put(
-        `/api/orders/${orderId}`,
+        `/api/admin/orders/${orderId}/status`,
         { status },
         config
-      );
+      ); // Updated endpoint
 
       dispatch({ type: ADMIN_ORDER_UPDATE_SUCCESS, payload: data });
     } catch (error) {

@@ -1,7 +1,16 @@
 import React from "react";
 import { Link } from "react-router-dom";
+import "./ProductList.css";
 
 const ProductList = ({ products, onDelete }) => {
+  // Function to format price to INR
+  const formatPrice = (price) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+    }).format(price);
+  };
+
   return (
     <div>
       <h2>Product List</h2>
@@ -17,7 +26,7 @@ const ProductList = ({ products, onDelete }) => {
           {products.map((product) => (
             <tr key={product._id}>
               <td>{product.name}</td>
-              <td>${product.price}</td>
+              <td>{formatPrice(product.price)}</td> {/* Format price to INR */}
               <td>
                 <Link to={`/admin/products/edit/${product._id}`}>Edit</Link>
                 <button onClick={() => onDelete(product._id)}>Delete</button>

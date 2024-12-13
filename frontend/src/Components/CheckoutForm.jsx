@@ -17,7 +17,7 @@ const CheckoutForm = ({ onSubmit }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    onsubmit(formData);
+    onSubmit(formData);
   };
   return (
     <div>

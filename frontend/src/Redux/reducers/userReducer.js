@@ -1,26 +1,60 @@
-import { SET_USER, LOGOUT_USER } from "../actions/types";
+import {
+  USER_REGISTER_REQUEST,
+  USER_REGISTER_SUCCESS,
+  USER_REGISTER_FAIL,
+  USER_LOGIN_REQUEST,
+  USER_LOGIN_SUCCESS,
+  USER_LOGIN_FAIL,
+  USER_LOGOUT,
+  SET_USER,
+} from "../actions/types";
 
 const initialState = {
-  userInfo: JSON.parse(localStorage.getItem("userInfo")) || null, // Check if user is already logged in
   loading: false,
+  userInfo: null,
   error: null,
 };
 
-const userReducer = (state = initialState, action) => {
+export const userReducer = (state = initialState, action) => {
   switch (action.type) {
-    case SET_USER:
-      // Save user info and token to localStorage
-      localStorage.setItem("userInfo", JSON.stringify(action.payload));
-      return { ...state, userInfo: action.payload };
+    case USER_REGISTER_REQUEST:
+    case USER_LOGIN_REQUEST:
+      return {
+        ...state,
+        loading: true,
+        error: null,
+      };
 
-    case LOGOUT_USER:
-      // Remove user info and token from localStorage on logout
-      localStorage.removeItem("userInfo");
-      return { ...state, userInfo: null };
+    case USER_REGISTER_SUCCESS:
+    case USER_LOGIN_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        userInfo: action.payload,
+        error: null,
+      };
+
+    case USER_REGISTER_FAIL:
+    case USER_LOGIN_FAIL:
+      return {
+        ...state,
+        loading: false,
+        error: action.payload,
+      };
+
+    case USER_LOGOUT:
+      return {
+        ...state,
+        userInfo: null,
+      };
+
+    case SET_USER:
+      return {
+        ...state,
+        userInfo: action.payload,
+      };
 
     default:
       return state;
   }
 };
-
-export default userReducer;

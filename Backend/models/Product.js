@@ -16,6 +16,7 @@ const productSchema = new mongoose.Schema({
   image: {
     type: String,
     required: true,
+    match: /^https?:\/\/.*\.(jpg|jpeg|png|gif)$/i, // Example regex for image URLs
   },
   category: {
     type: String,
@@ -24,6 +25,7 @@ const productSchema = new mongoose.Schema({
   stock: {
     type: Number,
     required: true,
+    default: 0, // Default stock is 0
   },
 });
 

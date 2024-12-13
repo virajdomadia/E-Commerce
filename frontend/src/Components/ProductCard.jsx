@@ -8,14 +8,7 @@ const ProductCard = ({ product }) => {
       {/* Product Image */}
       <Link to={`/product/${product._id}`}>
         <img src={product.image} alt={product.name} className="product-image" />
-        <img
-          src={
-            product.image ||
-            "https://dummyimage.com/200x200/000/fff.jpg&text=image+placeholder"
-          }
-          alt={product.name || "Product"}
-          className="product-image"
-        />
+        <img src={product.image} alt={product.name} className="product-image" />
       </Link>
 
       {/* Product Details */}

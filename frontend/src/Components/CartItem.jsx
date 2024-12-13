@@ -1,6 +1,6 @@
 import React from "react";
 import { useDispatch } from "react-redux";
-import { updateCart, removeFromCart } from "../redux/actions/cartActions";
+import { addToCart, removeFromCart } from "../redux/actions/cartActions"; // Import correct actions
 import "./CartItem.css";
 
 const CartItem = ({ item }) => {
@@ -9,7 +9,7 @@ const CartItem = ({ item }) => {
   // Handle updating item quantity
   const handleQuantityChange = (newQuantity) => {
     if (newQuantity > 0) {
-      dispatch(updateCart(item.product._id, newQuantity)); // Call action to update quantity
+      dispatch(addToCart(item.product, newQuantity)); // Call action to update quantity
     }
   };
 
@@ -21,18 +21,15 @@ const CartItem = ({ item }) => {
   return (
     <div className="cart-item">
       <img
-        src={
-          item.product.image ||
-          "https://dummyimage.com/200x200/000/fff.jpg&text=image+placeholder"
-        }
-        alt={item.product.name || "Product"}
+        src={item.product.image}
+        alt={item.product.name}
         className="cart-item-image"
       />
 
       <div className="cart-item-details">
         <h4>{item.product.name}</h4>
-        <p>Price: ${item.product.price}</p>
-        <p>Subtotal: ${(item.product.price * item.quantity).toFixed(2)}</p>
+        <p>Price: ₹{item.product.price}</p>
+        <p>Subtotal: ₹{(item.product.price * item.quantity).toFixed(2)}</p>
       </div>
 
       {/* Quantity controls */}
