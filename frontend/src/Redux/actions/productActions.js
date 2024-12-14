@@ -6,21 +6,20 @@ import {
 } from "./types";
 
 export const fetchProducts = () => async (dispatch) => {
-  dispatch({ type: FETCH_PRODUCTS_LOADING }); // Dispatch loading state
+  dispatch({ type: FETCH_PRODUCTS_LOADING });
 
   try {
-    const response = await axios.get("/api/products"); // Updated API call using axios
+    const response = await axios.get("/api/products");
 
-    // Dispatch the fetched data
+    // Extract only the products array
     dispatch({
       type: FETCH_PRODUCTS,
-      payload: response.data, // Use response.data for axios
+      payload: response.data.products, // Extract products array from the response
     });
   } catch (error) {
-    // Dispatch error if fetching fails
     dispatch({
       type: FETCH_PRODUCTS_ERROR,
-      payload: error.response?.data.message || error.message, // Handle error properly
+      payload: error.response?.data.message || error.message,
     });
   }
 };

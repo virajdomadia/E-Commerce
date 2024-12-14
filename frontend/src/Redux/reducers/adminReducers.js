@@ -21,43 +21,45 @@ import {
 const initialState = {
   products: [],
   orders: [],
-  loading: false,
-  error: null,
+  productLoading: false,
+  orderLoading: false,
+  productError: null,
+  orderError: null,
 };
 
 export const adminReducer = (state = initialState, action) => {
   switch (action.type) {
     // Products
     case ADMIN_PRODUCT_LIST_REQUEST:
-      return { ...state, loading: true };
+      return { ...state, productLoading: true };
     case ADMIN_PRODUCT_LIST_SUCCESS:
-      return { ...state, loading: false, products: action.payload };
+      return { ...state, productLoading: false, products: action.payload };
     case ADMIN_PRODUCT_LIST_FAIL:
-      return { ...state, loading: false, error: action.payload };
+      return { ...state, productLoading: false, productError: action.payload };
 
     case ADMIN_PRODUCT_ADD_REQUEST:
-      return { ...state, loading: true };
+      return { ...state, productLoading: true };
     case ADMIN_PRODUCT_ADD_SUCCESS:
       return {
         ...state,
-        loading: false,
+        productLoading: false,
         products: [...state.products, action.payload],
       };
     case ADMIN_PRODUCT_ADD_FAIL:
-      return { ...state, loading: false, error: action.payload };
+      return { ...state, productLoading: false, productError: action.payload };
 
     case ADMIN_PRODUCT_UPDATE_REQUEST:
-      return { ...state, loading: true };
+      return { ...state, productLoading: true };
     case ADMIN_PRODUCT_UPDATE_SUCCESS:
       return {
         ...state,
-        loading: false,
+        productLoading: false,
         products: state.products.map((product) =>
           product._id === action.payload._id ? action.payload : product
         ),
       };
     case ADMIN_PRODUCT_UPDATE_FAIL:
-      return { ...state, loading: false, error: action.payload };
+      return { ...state, productLoading: false, productError: action.payload };
 
     case ADMIN_PRODUCT_DELETE_SUCCESS:
       return {
@@ -67,30 +69,32 @@ export const adminReducer = (state = initialState, action) => {
         ),
       };
     case ADMIN_PRODUCT_DELETE_FAIL:
-      return { ...state, error: action.payload };
+      return { ...state, productError: action.payload };
 
     // Orders
     case ADMIN_ORDER_LIST_REQUEST:
-      return { ...state, loading: true };
+      return { ...state, orderLoading: true };
     case ADMIN_ORDER_LIST_SUCCESS:
-      return { ...state, loading: false, orders: action.payload };
+      return { ...state, orderLoading: false, orders: action.payload };
     case ADMIN_ORDER_LIST_FAIL:
-      return { ...state, loading: false, error: action.payload };
+      return { ...state, orderLoading: false, orderError: action.payload };
 
     case ADMIN_ORDER_UPDATE_REQUEST:
-      return { ...state, loading: true };
+      return { ...state, orderLoading: true };
     case ADMIN_ORDER_UPDATE_SUCCESS:
       return {
         ...state,
-        loading: false,
+        orderLoading: false,
         orders: state.orders.map((order) =>
           order._id === action.payload._id ? action.payload : order
         ),
       };
     case ADMIN_ORDER_UPDATE_FAIL:
-      return { ...state, loading: false, error: action.payload };
+      return { ...state, orderLoading: false, orderError: action.payload };
 
     default:
       return state;
   }
 };
+
+export default adminReducer;

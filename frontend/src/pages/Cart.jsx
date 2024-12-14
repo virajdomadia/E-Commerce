@@ -56,7 +56,7 @@ const Cart = () => {
             <span>Actions</span>
           </div>
           {cartItems.map((item, index) => (
-            <div key={item.productId || index} className="cart-item">
+            <div key={item.product?._id || index} className="cart-item">
               <img
                 src={
                   item.product?.image ||
@@ -66,7 +66,7 @@ const Cart = () => {
                 className="cart-item-image"
               />
               <Link
-                to={`/product/${item.productId}`}
+                to={`/product/${item.product?._id}`}
                 className="cart-item-name"
               >
                 {item.product?.name || "Unknown Product"}
@@ -75,7 +75,7 @@ const Cart = () => {
               <div>
                 <button
                   onClick={() =>
-                    handleQuantityChange(item.productId, item.quantity - 1)
+                    handleQuantityChange(item.product?._id, item.quantity - 1)
                   }
                   disabled={item.quantity <= 1}
                 >
@@ -84,7 +84,7 @@ const Cart = () => {
                 <span>{item.quantity}</span>
                 <button
                   onClick={() =>
-                    handleQuantityChange(item.productId, item.quantity + 1)
+                    handleQuantityChange(item.product?._id, item.quantity + 1)
                   }
                 >
                   +
@@ -93,7 +93,7 @@ const Cart = () => {
               <div>
                 ₹{((item.product?.price || 0) * item.quantity).toFixed(2)}
               </div>
-              <button onClick={() => handleRemove(item.productId)}>
+              <button onClick={() => handleRemove(item.product?._id)}>
                 Remove
               </button>
             </div>

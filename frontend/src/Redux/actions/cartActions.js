@@ -7,30 +7,61 @@ import {
   CART_CLEAR_ITEMS,
 } from "./types";
 
-// Add item to cart
-export const addToCart = (product, quantity) => async (dispatch, getState) => {
-  // Making the API call to update cart on server if needed
-  try {
-    const { data } = await axios.post("/api/cart", { product, quantity }); // Updated API endpoint
-    dispatch({
-      type: CART_ADD_ITEM,
-      payload: { ...product, quantity, data }, // Include the response data if necessary
-    });
+const token = localStorage.getItem("authToken");
 
-    // Saving cart items to localStorage for persistence across sessions
-    localStorage.setItem(
-      "cartItems",
-      JSON.stringify(getState().cart.cartItems)
-    );
-  } catch (error) {
-    console.error("Error adding item to cart:", error);
-  }
+const config = {
+  headers: {
+    "Content-Type": "application/json",
+    Authorization: token ? `Bearer ${token}` : "",
+  },
 };
+
+// Add item to cart
+export const addToCart =
+  (product, quantity = 1) =>
+  async (dispatch, getState) => {
+    try {
+      let productId = product;
+      let productDetails = product;
+
+      if (typeof product === "string" || !product._id) {
+        const { data } = await axios.get(`/api/products/${productId}`);
+        productDetails = data;
+      }
+
+      if (!productDetails._id) {
+        console.error("Product ID is required.");
+        return;
+      }
+
+      // Adding to cart logic
+      const { data } = await axios.post(
+        "/api/cart",
+        { productId: productDetails._id, quantity },
+        config
+      );
+
+      dispatch({
+        type: CART_ADD_ITEM,
+        payload: { ...productDetails, quantity, data: data.product }, // Ensure correct product data
+      });
+
+      localStorage.setItem(
+        "cartItems",
+        JSON.stringify(getState().cart.cartItems)
+      );
+    } catch (error) {
+      console.error(
+        "Error adding item to cart:",
+        error.response ? error.response.data : error.message
+      );
+    }
+  };
 
 // Remove item from cart
 export const removeFromCart = (id) => async (dispatch, getState) => {
   try {
-    await axios.delete(`/api/cart/${id}`); // Updated API endpoint to remove item from cart
+    await axios.delete(`/api/cart/${id}`, config);
 
     dispatch({
       type: CART_REMOVE_ITEM,
@@ -42,7 +73,10 @@ export const removeFromCart = (id) => async (dispatch, getState) => {
       JSON.stringify(getState().cart.cartItems)
     );
   } catch (error) {
-    console.error("Error removing item from cart:", error);
+    console.error(
+      "Error removing item from cart:",
+      error.response ? error.response.data : error.message
+    );
   }
 };
 
@@ -90,18 +124,21 @@ export const clearCart = () => async (dispatch) => {
 // Update item quantity in the cart
 export const updateCart = (id, quantity) => async (dispatch, getState) => {
   try {
-    const { data } = await axios.put(`/api/cart/${id}`, { quantity }); // Make API call to update cart on server
+    const { data } = await axios.put(`/api/cart/${id}`, { quantity }, config);
 
     dispatch({
-      type: CART_ADD_ITEM, // Using the same type as adding an item to update the quantity
+      type: CART_ADD_ITEM,
       payload: { ...data.product, quantity, data },
     });
 
     localStorage.setItem(
       "cartItems",
       JSON.stringify(getState().cart.cartItems)
-    ); // Save updated cart to localStorage
+    );
   } catch (error) {
-    console.error("Error updating item in cart:", error);
+    console.error(
+      "Error updating item in cart:",
+      error.response ? error.response.data : error.message
+    );
   }
 };

@@ -36,6 +36,12 @@ const Home = () => {
     );
   }
 
+  // Ensure products is an array before trying to map it
+  if (!Array.isArray(products)) {
+    console.error("Products is invalid:", products);
+    return <div>Products data is invalid. Please try again.</div>;
+  }
+
   if (products.length === 0) {
     return <div>No products available at the moment.</div>;
   }

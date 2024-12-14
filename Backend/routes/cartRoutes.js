@@ -4,10 +4,10 @@ const Product = require("../models/Product");
 const protect = require("../middleware/authMiddleware"); // Import the protect middleware
 const router = express.Router();
 
-// Add item to cart (protected route)
+// Add item to cart (POST /api/cart) - Already Implemented
 router.post("/", protect, async (req, res) => {
   const { productId, quantity } = req.body;
-  const userId = req.user._id; // Get user ID from the middleware
+  const userId = req.user._id;
 
   if (!productId || !quantity) {
     return res
@@ -27,28 +27,21 @@ router.post("/", protect, async (req, res) => {
       return res.status(400).json({ message: "Product not found" });
     }
 
-    // Check if the user already has a cart
     let cart = await Cart.findOne({ user: userId });
-
     if (!cart) {
-      // If the cart doesn't exist, create a new one
       cart = new Cart({ user: userId, items: [] });
     }
 
-    // Check if the product already exists in the cart
     const existingItemIndex = cart.items.findIndex(
       (item) => item.product.toString() === productId
     );
 
     if (existingItemIndex >= 0) {
-      // Update quantity if product already exists in the cart
       cart.items[existingItemIndex].quantity += quantity;
     } else {
-      // Add new product to the cart
       cart.items.push({ product: productId, quantity });
     }
 
-    // Save the cart to the database
     await cart.save();
 
     res.status(201).json({ message: "Item added to cart successfully", cart });
@@ -57,9 +50,9 @@ router.post("/", protect, async (req, res) => {
   }
 });
 
-// Get items in the user's cart (protected route)
+// Get items in the user's cart (GET /api/cart)
 router.get("/", protect, async (req, res) => {
-  const userId = req.user._id; // Get user ID from the authenticated user
+  const userId = req.user._id;
 
   try {
     const cart = await Cart.findOne({ user: userId }).populate(
@@ -77,10 +70,48 @@ router.get("/", protect, async (req, res) => {
   }
 });
 
-// Delete item from cart (protected route)
-router.delete("/:itemId", protect, async (req, res) => {
-  const { itemId } = req.params;
-  const userId = req.user._id; // Get user ID from the authenticated user
+// Update item quantity in cart (PUT /api/cart/:id) - New Functionality
+router.put("/:id", protect, async (req, res) => {
+  const { id } = req.params; // cart item ID
+  const { quantity } = req.body; // New quantity to set
+  const userId = req.user._id;
+
+  if (!quantity || quantity <= 0) {
+    return res
+      .status(400)
+      .json({ message: "Quantity must be a positive number" });
+  }
+
+  try {
+    const cart = await Cart.findOne({ user: userId });
+
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
+    }
+
+    const itemIndex = cart.items.findIndex(
+      (item) => item._id.toString() === id
+    );
+
+    if (itemIndex === -1) {
+      return res.status(404).json({ message: "Cart item not found" });
+    }
+
+    // Update the quantity of the item
+    cart.items[itemIndex].quantity = quantity;
+
+    await cart.save();
+
+    res.status(200).json({ message: "Cart item updated successfully", cart });
+  } catch (err) {
+    res.status(500).json({ message: "Server error", error: err.message });
+  }
+});
+
+// Delete item from cart (DELETE /api/cart/:id) - Already Implemented
+router.delete("/:id", protect, async (req, res) => {
+  const { id } = req.params; // cart item ID
+  const userId = req.user._id;
 
   try {
     const cart = await Cart.findOne({ user: userId });
@@ -89,7 +120,7 @@ router.delete("/:itemId", protect, async (req, res) => {
     }
 
     const itemIndex = cart.items.findIndex(
-      (item) => item._id.toString() === itemId
+      (item) => item._id.toString() === id
     );
     if (itemIndex === -1) {
       return res.status(404).json({ message: "Cart item not found" });

@@ -15,16 +15,17 @@ const initialState = {
 const cartReducer = (state = initialState, action) => {
   switch (action.type) {
     case CART_ADD_ITEM:
-      // Check if item already exists in the cart
       const item = action.payload;
-      const existItem = state.cartItems.find((x) => x.product === item.product);
+      const existItem = state.cartItems.find(
+        (x) => x.product._id === item.product._id
+      );
 
       if (existItem) {
         // Update quantity if item already exists in the cart
         return {
           ...state,
           cartItems: state.cartItems.map((x) =>
-            x.product === existItem.product ? item : x
+            x.product._id === existItem.product._id ? item : x
           ),
         };
       } else {
@@ -36,28 +37,26 @@ const cartReducer = (state = initialState, action) => {
       }
 
     case CART_REMOVE_ITEM:
-      // Remove item from the cart
       return {
         ...state,
-        cartItems: state.cartItems.filter((x) => x.product !== action.payload),
+        cartItems: state.cartItems.filter(
+          (x) => x.product._id !== action.payload
+        ),
       };
 
     case CART_SAVE_SHIPPING_ADDRESS:
-      // Save shipping address
       return {
         ...state,
         shippingAddress: action.payload,
       };
 
     case CART_SAVE_PAYMENT_METHOD:
-      // Save payment method
       return {
         ...state,
         paymentMethod: action.payload,
       };
 
     case CART_CLEAR_ITEMS:
-      // Clear all items from the cart
       return {
         ...state,
         cartItems: [],

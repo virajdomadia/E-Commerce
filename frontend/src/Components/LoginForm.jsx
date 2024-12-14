@@ -40,7 +40,6 @@ const LoginForm = () => {
 
   return (
     <div className="login-form-container">
-      <h2>Login</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
@@ -79,9 +78,6 @@ const LoginForm = () => {
           Login
         </button>
       </form>
-      <p className="signup-prompt">
-        Don't have an account? <a href="/signup">Sign up here</a>.
-      </p>
     </div>
   );
 };
