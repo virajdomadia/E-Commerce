@@ -17,9 +17,15 @@ const Login = () => {
         email,
         password,
       });
+
       const { user, token } = res.data;
       login({ user, token });
-      navigate("/");
+
+      if (user.isAdmin) {
+        navigate("/admin");
+      } else {
+        navigate("/");
+      }
     } catch (error) {
       console.error("Login failed", error);
       setError("Invalid email or password");
@@ -28,7 +34,6 @@ const Login = () => {
 
   return (
     <div className="flex h-screen">
-      {/* Left Panel with E-commerce branding */}
       <div className="hidden md:flex w-1/2 bg-gradient-to-br from-yellow-400 via-orange-500 to-red-500 items-center justify-center text-white p-12">
         <div className="text-center max-w-md">
           <h1 className="text-5xl font-extrabold mb-6">
@@ -46,7 +51,6 @@ const Login = () => {
         </div>
       </div>
 
-      {/* Right Panel - Login Form */}
       <div className="w-full md:w-1/2 flex items-center justify-center bg-white p-12">
         <form className="w-full max-w-sm" onSubmit={handleSubmit}>
           <h2 className="text-4xl font-bold text-gray-800 mb-8 text-center">
