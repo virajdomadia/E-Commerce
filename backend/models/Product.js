@@ -4,31 +4,44 @@ const productSchema = new mongoose.Schema(
   {
     title: {
       type: String,
-      required: true,
+      required: [true, "Product title is required"],
+      trim: true,
     },
     description: {
       type: String,
-      required: true,
+      required: [true, "Product description is required"],
     },
     price: {
       type: Number,
-      required: true,
-    },
-    imageUrl: {
-      type: String,
-      required: true,
+      required: [true, "Product price is required"],
     },
     category: {
       type: String,
-      required: true,
+      required: [true, "Product category is required"],
     },
     images: {
       type: [String],
-      required: true,
+      set: (urls) => urls.map((url) => url.trim()),
+      validate: {
+        validator: function (arr) {
+          return arr.length > 0 && arr[0] !== "";
+        },
+        message: "At least one image URL is required",
+      },
     },
-    imageUrl: {
-      type: String,
-      required: false,
+    countInStock: {
+      type: Number,
+      required: true,
+      default: 0,
+    },
+    isFeatured: {
+      type: Boolean,
+      default: false,
+    },
+    createdBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      required: true, // only Admins can create
     },
   },
   {
@@ -36,4 +49,5 @@ const productSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("Product", productSchema);
+const Product = mongoose.model("Product", productSchema);
+module.exports = Product;
