@@ -15,7 +15,11 @@ const Home = () => {
   };
 
   useEffect(() => {
-    fetchProducts();
+    const interval = setInterval(() => {
+      fetchProducts(); // your existing fetch function
+    }, 5000); // refresh every 5 seconds
+
+    return () => clearInterval(interval);
   }, []);
 
   return (

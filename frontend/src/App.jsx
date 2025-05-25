@@ -9,6 +9,7 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import AddProduct from "./components/AddProduct";
 import EditProduct from "./components/EditProduct";
 import Navbar from "./components/Navbar";
+import ProductDetails from "./pages/ProductDetails";
 
 function App() {
   return (
@@ -48,6 +49,14 @@ function App() {
               element={
                 <ProtectedRoute>
                   <EditProduct />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/products/:id"
+              element={
+                <ProtectedRoute>
+                  <ProductDetails />
                 </ProtectedRoute>
               }
             />

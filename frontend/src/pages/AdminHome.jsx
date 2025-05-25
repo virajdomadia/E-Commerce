@@ -25,7 +25,6 @@ const AdminHome = () => {
       return;
 
     try {
-      // Get token from localStorage (or wherever you store it)
       const token = localStorage.getItem("token");
 
       if (!token) {
@@ -53,7 +52,6 @@ const AdminHome = () => {
 
   return (
     <div className="max-w-7xl mx-auto p-6">
-      {/* Products Grid or No Products Message */}
       {products.length === 0 ? (
         <p className="text-center text-gray-500 text-lg mt-20">
           No products found.
@@ -68,7 +66,7 @@ const AdminHome = () => {
               showAddToCart={false}
               onEdit={handleEdit}
               onDelete={handleDelete}
-              isAdmin={true} // ✅ This enables "In Stock" info
+              isAdmin={true}
             />
           ))}
         </div>
