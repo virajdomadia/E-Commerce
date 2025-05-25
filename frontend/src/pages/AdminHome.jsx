@@ -9,7 +9,9 @@ const AdminHome = () => {
 
   const fetchProducts = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/products");
+      const res = await axios.get(
+        "https://e-commerce-backend-dfvz.onrender.com/api/products"
+      );
       setProducts(res.data);
     } catch (error) {
       console.error("Failed to fetch products", error);
@@ -32,11 +34,14 @@ const AdminHome = () => {
         return;
       }
 
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.delete(
+        `https://e-commerce-backend-dfvz.onrender.com/api/products/${id}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       setProducts((prevProducts) => prevProducts.filter((p) => p._id !== id));
       alert("Product deleted successfully.");

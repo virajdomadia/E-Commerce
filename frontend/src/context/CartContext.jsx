@@ -26,7 +26,7 @@ export const CartProvider = ({ children }) => {
         updateQuantity(product._id, existingItem.quantity + quantity);
       } else {
         const res = await axios.post(
-          "http://localhost:5000/api/cart/add",
+          "https://e-commerce-backend-dfvz.onrender.com/api/cart/add",
           { productId: product._id, quantity },
           { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -47,7 +47,7 @@ export const CartProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.put(
-        "http://localhost:5000/api/cart/update",
+        "https://e-commerce-backend-dfvz.onrender.com/api/cart/update",
         { productId, quantity },
         { headers: { Authorization: `Bearer ${token}` } }
       );
@@ -66,7 +66,7 @@ export const CartProvider = ({ children }) => {
     const token = localStorage.getItem("token");
     try {
       const res = await axios.delete(
-        `http://localhost:5000/api/cart/remove/${productId}`,
+        `https://e-commerce-backend-dfvz.onrender.com/api/cart/remove/${productId}`,
         { headers: { Authorization: `Bearer ${token}` } }
       );
 

@@ -17,7 +17,9 @@ const ProductDetails = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const res = await axios.get(`http://localhost:5000/api/products/${id}`);
+        const res = await axios.get(
+          `https://e-commerce-backend-dfvz.onrender.com/api/products/${id}`
+        );
         setProduct(res.data);
       } catch (err) {
         setError("Failed to load product");
@@ -52,9 +54,12 @@ const ProductDetails = () => {
 
     try {
       const token = localStorage.getItem("token");
-      await axios.delete(`http://localhost:5000/api/products/${id}`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      await axios.delete(
+        `https://e-commerce-backend-dfvz.onrender.com/api/products/${id}`,
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
       alert("Product deleted successfully.");
       navigate("/admin");
     } catch (error) {

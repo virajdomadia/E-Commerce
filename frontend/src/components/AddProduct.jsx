@@ -49,11 +49,15 @@ const AddProduct = () => {
     try {
       const token = localStorage.getItem("token"); // make sure you have token stored on login
 
-      await axios.post("http://localhost:5000/api/products", formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.post(
+        "https://e-commerce-backend-dfvz.onrender.com/api/products",
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       navigate("/admin");
     } catch (error) {

@@ -24,7 +24,7 @@ const CheckoutPage = () => {
 
     try {
       const res = await axios.post(
-        "http://localhost:5000/api/cart/checkout",
+        "https://e-commerce-backend-dfvz.onrender.com/api/cart/checkout",
         {},
         { headers: { Authorization: `Bearer ${token}` } }
       );

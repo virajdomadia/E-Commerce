@@ -22,7 +22,7 @@ const EditProduct = () => {
         const token = localStorage.getItem("token");
 
         const res = await axios.get(
-          `http://localhost:5000/api/products/${id}`,
+          `https://e-commerce-backend-dfvz.onrender.com/api/products/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -71,11 +71,15 @@ const EditProduct = () => {
     try {
       const token = localStorage.getItem("token"); // Retrieve token from local storage
 
-      await axios.put(`http://localhost:5000/api/products/${id}`, formData, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
+      await axios.put(
+        `https://e-commerce-backend-dfvz.onrender.com/api/products/${id}`,
+        formData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
 
       navigate("/admin");
     } catch (error) {
