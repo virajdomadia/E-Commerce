@@ -1,15 +1,17 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import axios from "axios";
+import { useCart } from "../context/CartContext";
 
 const ProductDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { addToCart } = useCart();
 
   const [product, setProduct] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
-  const [isAdmin, setIsAdmin] = useState(false); // ✅ determine admin access
+  const [isAdmin, setIsAdmin] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   useEffect(() => {
@@ -29,8 +31,12 @@ const ProductDetails = () => {
       setIsLoggedIn(!!token);
 
       if (token) {
-        const payload = JSON.parse(atob(token.split(".")[1]));
-        setIsAdmin(payload?.role === "admin");
+        try {
+          const payload = JSON.parse(atob(token.split(".")[1]));
+          setIsAdmin(payload?.role === "admin");
+        } catch {
+          setIsAdmin(false);
+        }
       }
     };
 
@@ -38,9 +44,7 @@ const ProductDetails = () => {
     checkUser();
   }, [id]);
 
-  const handleEdit = () => {
-    navigate(`/admin/edit-product/${id}`);
-  };
+  const handleEdit = () => navigate(`/admin/edit-product/${id}`);
 
   const handleDelete = async () => {
     if (!window.confirm("Are you sure you want to delete this product?"))
@@ -49,20 +53,13 @@ const ProductDetails = () => {
     try {
       const token = localStorage.getItem("token");
       await axios.delete(`http://localhost:5000/api/products/${id}`, {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+        headers: { Authorization: `Bearer ${token}` },
       });
       alert("Product deleted successfully.");
       navigate("/admin");
     } catch (error) {
-      console.error("Failed to delete product", error);
-      alert("Failed to delete product. Please try again.");
+      alert("Failed to delete product.");
     }
-  };
-
-  const handleAddToCart = () => {
-    alert("Added to cart (functionality can be added later)");
   };
 
   if (loading) return <p className="text-center mt-10">Loading...</p>;
@@ -72,13 +69,12 @@ const ProductDetails = () => {
   return (
     <div className="max-w-4xl mx-auto p-6 flex flex-col md:flex-row gap-8">
       <img
-        src={product?.images?.[0] || "/placeholder-image.png"}
-        alt={product?.title || "Product"}
+        src={product.images?.[0] || "/placeholder-image.png"}
+        alt={product.title}
         className="w-full md:w-1/2 object-cover rounded-lg"
       />
 
       <div className="flex-1">
-        {/* Featured badge */}
         {product.isFeatured && (
           <span className="inline-block bg-yellow-400 text-yellow-900 text-xs font-semibold px-2 py-1 rounded-full mb-3">
             Featured
@@ -86,17 +82,13 @@ const ProductDetails = () => {
         )}
 
         <h1 className="text-3xl font-bold mb-2">{product.title}</h1>
-
         <p className="text-lg text-yellow-600 font-semibold mb-1">
-          ${product.price}
+          ₹{product.price}
         </p>
-
         <p className="text-sm text-purple-600 uppercase mb-4">
           {product.category}
         </p>
-
         <p className="text-gray-800 mb-6">{product.description}</p>
-
         <p className="text-sm font-medium mb-4">
           {product.countInStock > 0 ? (
             <span className="text-green-600">
@@ -107,8 +99,7 @@ const ProductDetails = () => {
           )}
         </p>
 
-        {/* Admin buttons */}
-        {isAdmin && (
+        {isAdmin ? (
           <div className="flex gap-4 mt-4">
             <button
               onClick={handleEdit}
@@ -123,16 +114,16 @@ const ProductDetails = () => {
               Delete
             </button>
           </div>
-        )}
-
-        {/* User Add to Cart */}
-        {!isAdmin && isLoggedIn && product.countInStock > 0 && (
-          <button
-            onClick={handleAddToCart}
-            className="mt-6 w-full bg-purple-600 text-white py-3 rounded-lg shadow-md hover:bg-purple-700 transition"
-          >
-            Add to Cart
-          </button>
+        ) : (
+          isLoggedIn &&
+          product.countInStock > 0 && (
+            <button
+              onClick={() => addToCart(product)}
+              className="mt-6 w-full bg-purple-600 text-white py-3 rounded-lg shadow-md hover:bg-purple-700 transition"
+            >
+              Add to Cart
+            </button>
+          )
         )}
       </div>
     </div>
